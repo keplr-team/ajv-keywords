@@ -54,13 +54,15 @@ function _getDef(): CodeKeywordDefinition {
 
       function transformExpr(ts: string[]): Code {
         if (!ts.length) return data
-        const t = ts.pop() as string
+        const t = ts[ts.length - 1]
+        const remaining = ts.slice(0, -1)
+
         if (!(t in transform)) throw new Error(`transform: unknown transformation ${t}`)
         const func = gen.scopeValue("func", {
           ref: transform[t as TransformName],
           code: _`require("ajv-keywords/dist/definitions/transform").transform${getProperty(t)}`,
         })
-        const arg = transformExpr(ts)
+        const arg = transformExpr(remaining)
         return cfg && t === "toEnumCase" ? _`${func}(${arg}, ${cfg})` : _`${func}(${arg})`
       }
     },
